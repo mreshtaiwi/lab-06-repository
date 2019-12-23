@@ -31,7 +31,7 @@ object should look like this
 function locationHandler(request, response) {
     try {
         const geoData = require('./data/geo.json');
-        const city = 'Lynnwood';
+        const city = request.query.data;
         const locationData = new Location(city, geoData);
         response.status(200).json(locationData);
     }
