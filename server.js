@@ -29,15 +29,14 @@ object should look like this
 */
 
 function locationHandler(request, response) {
-    try {
-        const geoData = require('./data/geo.json');
-        const city = request.query.data;
-        const locationData = new Location(city, geoData);
-        response.status(200).json(locationData);
-    }
-    catch (error) {
-        errorHandler('So sorry, something went wrong.', request, response);
-    }
+
+    let locationData = getLocation(request.query.data);
+    response.status(200).json(locationData);
+}
+function getLocation(city){
+    let data = require('./data/geo.json');
+    return new Location(city, data);
+    response.status(200).json(locationData);
 }
 let locations = [];
 function Location(city, data) {
@@ -47,6 +46,7 @@ function Location(city, data) {
     this.longitude = data[0].lon;
     locations.push(this);
 }
+
 function weatherHandler(request, response) {
     try {
         const darkskyData = require('./data/darksky.json');
