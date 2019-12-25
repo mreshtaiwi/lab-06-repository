@@ -14,18 +14,76 @@ server.use(cors());
 
 server.get('/location', locationHandler);
 server.get('/weather', weatherHandler);
-
-// server.get('/weather', weatherHandler);
+server.get('/events', eventsHandler);
+// server.get('/yelp', yelpHandler);
 //server.use('*', notFoundHandler);
 //server.use(errorHandler);
 
+function yelpHandler(request, response) {
+    let city = request.query.search_query;
+    let lat = request.query['latitude'];
+    let lon = request.query['longitude'];
+    console.log(request.query);
+    getYelpData(city,lat, lon)
+      .then((data) => {
+        response.status(200).send(data);
+      });
+  }
+  
+  function getYelpData(city,lat, lon) {
+    const url = `https://api.yelp.com/v3/businesses/search?term=delis&latitude=37.786882&longitude=-122.399972`;
+    return superagent.get(url)
+      .then((yelpData) => {
+
+        let yelp = yelpData.businesses.map((day) => new Yelp(day));
+        console.log(yelp);
+        return yelp;
+      });
+  }
+
+  function Yelp(day) {
+    this.name = day.businesses.name;
+    this.link =day.businesses.url;
+    this.image =day.businesses.image_url;
+  }  
+
+
+  function eventsHandler(request, response) {
+    let city = request.query.search_query;
+    let lat = request.query['latitude'];
+    let lng = request.query['longitude'];
+    getEventsData(city,lat, lng)
+      .then((data) => {
+        response.status(200).send(data);
+      });
+  
+  }
+  
+  function getEventsData(city,lat, lng) {
+    const url = `http://api.eventful.com/json/events/search?app_key=${process.env.EVENTFUL_API_KEY}&q=${city}&${lat},${lng}`;
+    return superagent.get(url)
+      .then((eventData) => {
+        let datafile = eventData.text;
+        let jsonfile = JSON.parse(datafile);
+        //console.log(jsonfile.events);
+        let events = jsonfile.events.event.map((day) => new Event(day));
+        return events;
+      });
+  }
+
+  function Event(day) {
+    this.link = day.url;
+    this.name = day.city_name;
+    this.eventDate =day.start_time;
+    this.summary =day.description;
+  }
 function locationHandler(request, response) {
     let city = request.query.city;//the name city is from the query link 
     //http://localhost:3000/location?city=amman
-    console.log(city);
+    //console.log(city);
     getLocation(city)
         .then(locationData => {
-            console.log(locationData);
+            //console.log(locationData);
             response.status(200).json(locationData);
         });
 }
