@@ -23,7 +23,7 @@ function yelpHandler(request, response) {
     let city = request.query.search_query;
     let lat = request.query['latitude'];
     let lon = request.query['longitude'];
-    console.log(request.query);
+    // console.log(request.query);
     getYelpData(city,lat, lon)
       .then((data) => {
         response.status(200).send(data);
@@ -34,9 +34,10 @@ function yelpHandler(request, response) {
     const url = `https://api.yelp.com/v3/businesses/search?term=delis&latitude=37.786882&longitude=-122.399972`;
     return superagent.get(url)
       .then((yelpData) => {
-
+        let me = yelpData.body;
+        console.log(me);
         let yelp = yelpData.businesses.map((day) => new Yelp(day));
-        console.log(yelp);
+        //console.log(yelp);
         return yelp;
       });
   }
